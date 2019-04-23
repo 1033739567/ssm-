@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns:mvc="http://www.springframework.org/schema/mvc"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+  <context:annotation-config />
+  <!-- 扫描注解: 控制器 -->
+  <context:component-scan use-default-filters="false" base-package="cn.chenlilin.blog.controller" >
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+  </context:component-scan>
+  <context:component-scan use-default-filters="false" base-package="cn.chenlilin.blog.controller" >
+    <context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
+  </context:component-scan>
+  <!-- 扫描事件监听器 -->
+  <!--<context:component-scan use-default-filters="false" base-package="com.qudaowuyou.platform.web.listener" >
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+  </context:component-scan>-->
+
+  <!-- 加载 web 配置属性 -->
+  <!--<context:property-placeholder
+    location="classpath:/spring-web/web-config.properties"
+    ignore-unresolvable="true"/>-->
+
+  <!-- 扫描 web 配置 -->
+  <!--<context:component-scan use-default-filters="false" base-package="com.qudaowuyou.platform.web.support.model" >
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+  </context:component-scan>
+  <context:component-scan use-default-filters="false" base-package="com.qudaowuyou.platform.web.support.customerscore" >
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+  </context:component-scan>
+  &lt;!&ndash; 扫描事件 &ndash;&gt;
+  <context:component-scan use-default-filters="false" base-package="com.qudaowuyou.platform.web.support.event" >
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Component"/>
+  </context:component-scan>-->
+
+
+  <aop:aspectj-autoproxy />
+
+  <mvc:annotation-driven>
+    <mvc:message-converters>
+      <!-- 用于处理Spring中 @ResponseBody 输出 String 含中文时乱码问题 -->
+      <!--<bean class="com.qudaowuyou.common.web.support.spring.converter.Utf8String2HttpMessageConverter"/>-->
+      <!-- RESTful API 消息转换，响应数据必须为 com.qudaowuyou.platform.core.support.http.response.RestResponse -->
+      <!--<bean class="com.qudaowuyou.common.web.support.spring.converter.RestJson2HttpMessageConverter"/>-->
+      <bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"/>
+
+      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+        <property name="objectMapper">
+          <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+            <property name="dateFormat">
+              <bean class="java.text.SimpleDateFormat">
+                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss"/>
+              </bean>
+            </property>
+          </bean>
+        </property>
+      </bean>
+      <!-- fastJson 转码，避免IE执行AJAX时,返回JSON出现下载文件 -->
+      <!--<bean class="com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter"/>-->
+    </mvc:message-converters>
+  </mvc:annotation-driven>
+
+  <mvc:default-servlet-handler/>
+  <!-- 配置资源静态目录 -->
+  <!--<mvc:resources mapping="/bootstrap/**" location="classpath:/public/bootstrap/"/>
+  <mvc:resources mapping="/font/**" location="classpath:/public/font/"/>
+  <mvc:resources mapping="/images/**" location="classpath:/public/images/"/>
+  <mvc:resources mapping="/css/**" location="classpath:/public/css/"/>
+  <mvc:resources mapping="/js/**" location="classpath:/public/js/"/>
+  <mvc:resources mapping="/ueditor/**" location="classpath:/public/ueditor/"/>
+  <mvc:resources mapping="/kindeditor/**" location="classpath:/public/kindeditor/"/>
+  <mvc:resources mapping="/docs/**" location="classpath:/public/docs/"/>-->
+
+
+  <!-- 以下 validator ConversionService 在使用 mvc:annotation-driven 已注册 -->
+  <!--<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+    <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+    &lt;!&ndash; 如果不指定，默认使用classpath下的 ValidationMessages.properties &ndash;&gt;
+    <property name="validationMessageSource" ref="messageSource"/>
+  </bean>-->
+
+  <!-- 国际化的消息资源文件 -->
+  <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <!--<property name="basename" value="validation-messages.default"/>-->
+    <!--<property name="basenames">
+      <list>
+        <value>validation-messages.default</value>
+        <value>validation-messages.web</value>
+      </list>
+    </property>-->
+    <property name="fallbackToSystemLocale" value="false"/>
+    <property name="useCodeAsDefaultMessage" value="true"/>
+    <property name="defaultEncoding" value="UTF-8"/>
+    <property name="cacheSeconds" value="60"/>
+  </bean>
+
+  <!-- jsp 视图调度器 -->
+  <bean id="viewResolverCommon"  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+    <property name="prefix" value="/"/>
+    <property name="suffix" value=".jsp"/>
+    <property name="contentType" value="text/html;charset=utf-8"/>
+    <property name="viewClass" value="org.springframework.web.servlet.view.InternalResourceView"/>
+    <property name="order" value="1"/>
+  </bean>
+
+  <!-- FreeMarker 模板引擎配置 -->
+  <!--<bean id="freeMarkerConfigurer" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">-->
+  <!--<bean id="freeMarkerConfigurer" class="com.qudaowuyou.platform.web.util.authorization.shiro.freemarker.ShiroTagFreeMarkerConfigurer">
+    <property name="templateLoaderPath" value="classpath:/templates" />
+    <property name="freemarkerSettings">
+      <props>
+        <prop key="template_update_delay">2</prop>
+        <prop key="defaultEncoding">UTF-8</prop>
+        <prop key="url_escaping_charset">UTF-8</prop>
+        <prop key="locale">zh_CN</prop>
+        <prop key="boolean_format">true,false</prop>
+        <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+        <prop key="date_format">yyyy-MM-dd</prop>
+        <prop key="time_format">HH:mm:ss</prop>
+        <prop key="number_format">0.######</prop>
+      </props>
+    </property>
+  </bean>-->
+
+  <!-- FreeMarker 视图构造器 -->
+ <!-- <bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+    <property name="cache" value="true"/>
+    <property name="suffix" value=".ftl"/>
+    <property name="prefix" value=""/>
+    <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"/>
+    <property name="requestContextAttribute" value="rc"/>
+    <property name="exposeRequestAttributes" value="true"/>
+    <property name="exposeSpringMacroHelpers" value="true"/>
+    <property name="exposeSessionAttributes" value="true"/>
+    <property name="contentType" value="text/html;charset=UTF-8" />
+    <property name="order" value="0"/>
+  </bean>-->
+
+  <!-- 支持多种文件格式，最大上传 100M -->
+  <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <property name="defaultEncoding" value="UTF-8" />
+    <property name="maxUploadSize" value="1048576000" />
+    <property name="maxInMemorySize" value="40960" />
+  </bean>
+
+  <!-- 异常处理，注意顺序 -->
+ <!-- <bean id="restExceptionHandler" class="com.qudaowuyou.common.web.support.spring.exception.RestExceptionHandler"/>
+  <bean id="exceptionHandler" class="com.qudaowuyou.platform.web.util.exception.ExceptionHandler"/>-->
+
+
+</beans>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:cache="http://www.springframework.org/schema/cache"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                             http://www.springframework.org/schema/cache
+                            http://www.springframework.org/schema/cache/spring-cache-3.2.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+  <!-- 引入 mysql 配置 -->
+  <context:property-placeholder
+    location="classpath:/spring-core/mysql-jdbc-connection.properties"
+    ignore-unresolvable="true"/>
+  <!--<bean id="druid-log-filter" class="com.alibaba.druid.filter.logging.Log4j2Filter">
+    <property name="resultSetLogEnabled" value="false"/>
+    <property name="statementExecutableSqlLogEnable" value="true"/>
+  </bean>
+-->
+  <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+    <property name="driverClassName" value="${dataSource.driver}" />
+    <property name="url" value="${dataSource.url}" />
+    <property name="username" value="${dataSource.username}" />
+    <property name="password" value="${dataSource.password}" />
+    <property name="initialSize" value="1"/>
+    <property name="minIdle" value="1"/>
+    <property name="maxActive" value="20"/>
+
+    <property name="maxWait" value="60000"/>
+
+    <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+
+    <property name="minEvictableIdleTimeMillis" value="300000"/>
+
+    <property name="validationQuery" value="SELECT 'x'"/>
+    <property name="testWhileIdle" value="true"/>
+    <property name="testOnBorrow" value="false"/>
+    <property name="testOnReturn" value="false"/>
+
+    <property name="filters" value="wall"/>
+   <!-- <property name="proxyFilters">
+      <list>
+        <ref bean="druid-log-filter"/>
+      </list>
+    </property>-->
+  </bean>
+
+  <!-- mybatis Sql Session 管理工厂 -->
+  <bean id="blogSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="configLocation" value="classpath:/spring-core/configuration.xml"/>
+    <property name="mapperLocations">
+      <list>
+        <value>classpath*:cn.chenlilin.blog.mapper/*.xml</value>
+      </list>
+    </property>
+  </bean>
+  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    <property name="basePackage" value="cn.chenlilin.blog.mapper"/>
+    <property name="sqlSessionFactoryBeanName" value="blogSqlSessionFactory"/>
+
+  </bean>
+
+
+  <!-- 扫描 Service 注解 -->
+  <context:component-scan use-default-filters="false"
+    base-package="cn.chenlilin.blog.*.impl">
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+  </context:component-scan>
+
+
+</beans>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+  <!-- 在这个文件放置一些全局性的配置
+  <typeAliases>
+      <typeAlias type="实体类" alias="别名"/>
+  </typeAliases> -->
+
+  <settings>
+    <setting name="cacheEnabled" value="false" />
+    <!-- 打印查询语句 -->
+    <!--<setting name="logImpl" value="STDOUT_LOGGING" />-->
+  </settings>
+  <!-- 以下内容不再需要手动配置  已经自动映射 -->
+
+  <!-- 设置缓存和延迟加载等等重要的运行时的行为方式 -->
+  <!--<settings>
+    &lt;!&ndash; 设置超时时间，它决定驱动等待一个数据库响应的时间  &ndash;&gt;
+    <setting name="defaultStatementTimeout" value="25000"/>
+    &lt;!&ndash; 这个配置使全局的映射器启用或禁用缓存  &ndash;&gt;
+    <setting name="cacheEnabled" value="true" />
+    <setting name="lazyLoadingEnabled" value="true"/>
+    <setting name="useColumnLabel" value="true" />
+    <setting name="mapUnderscoreToCamelCase" value="true" />
+  </settings>-->
+  <plugins>
+    <!--<plugin interceptor="com.qudaowuyou.platform.core.pagination.interceptor.PreparePaginationInterceptor">
+      <property name="dialectClass" value="com.qudaowuyou.platform.core.pagination.dialect.db.MySQLDialect"/>
+      <property name="sqlPattern" value=".*ByPage*.*"/>
+    </plugin>-->
+    <plugin interceptor="cn.chenlilin.blog.filter.SqlCostInterceptor" />
+  </plugins>
+
+</configuration>
